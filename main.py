@@ -704,3 +704,13 @@ def correlation_data():
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         conn.close()
+
+
+@app.get("/api/debug-env")
+def debug_env():
+    return {"DATABASE_URL": os.environ.get("DATABASE_URL", "NOT SET")}
+```
+
+Commit that to GitHub, let it redeploy, then open:
+```
+https://web-production-4f270.up.railway.app/api/debug-env
