@@ -710,7 +710,3 @@ def correlation_data():
 def debug_env():
     return {"DATABASE_URL": os.environ.get("DATABASE_URL", "NOT SET")}
 ```
-
-Commit that to GitHub, let it redeploy, then open:
-```
-https://web-production-4f270.up.railway.app/api/debug-env
