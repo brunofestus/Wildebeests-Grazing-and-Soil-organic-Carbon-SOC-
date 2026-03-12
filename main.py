@@ -709,4 +709,3 @@ def correlation_data():
 @app.get("/api/debug-env")
 def debug_env():
     return {"DATABASE_URL": os.environ.get("DATABASE_URL", "NOT SET")}
-```
