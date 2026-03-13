@@ -179,7 +179,7 @@ input[type=range].op-sl::-moz-range-thumb{width:11px;height:11px;border-radius:5
   <div class="hdr-brand">
     <h1>Assessing the Impact of Migratory Wildebeest Grazing on Grassland Vegetation Productivity and Soil Organic Carbon Sequestration in the Mara-Serengeti Ecosystem.</h1>
 
-    <p>M.Sc. Dissertation · Festus Kiprono Bett · Keele University 2025   ·   <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="117774626564627a7861637e7f7e73746551767c70787d3f727e7c">[email&#160;protected]</a></p>
+    <p>M.Sc. Dissertation · Festus Kiprono Bett · Keele University 2025   ·   festuskipronobet@gmail.com</p>
   </div>
   <div class="hdr-status">
     <div class="dot" id="dot"></div>
@@ -316,7 +316,7 @@ input[type=range].op-sl::-moz-range-thumb{width:11px;height:11px;border-radius:5
         <div class="card-hd">
           <span class="card-title">Vegetation Regrowth Response After Grazing — Dry Season</span>
         </div>
-        <div class="card-insight">To investigate whether grazed areas show stimulated vegetation regrowth following rainfall, areas grazed during the Aug–Oct dry season were revisited and their NDVI values measured in the subsequent Nov–Dec short rains season. From the results, areas that were previously grazed recorded increased vegetation productivity</div>
+        <div class="card-insight">To investigate whether grazed areas show stimulated vegetation regrowth following rainfall, areas grazed during the Aug–Oct dry season were revisited and their NDVI values measured in the subsequent Nov–Dec short rains season.</div>
         <!-- Methodology diagram -->
         <div class="lag-diagram">
           <div class="lag-node">
@@ -350,7 +350,7 @@ input[type=range].op-sl::-moz-range-thumb{width:11px;height:11px;border-radius:5
         <div class="card-hd">
           <span class="card-title">Vegetation Regrowth Response After Grazing — Wet Season</span>
         </div>
-        <div class="card-insight">The same approach was applied to the wet season: areas grazed during Jan–Mar (peak wet) were assessed for NDVI in the following Apr–May late wet season to determine whether high-intensity grazing stimulates subsequent vegetation productivity. From the results, areas that were previously higly grazed recorded increased vegetation productivity </div>
+        <div class="card-insight">The same approach was applied to the wet season: areas grazed during Jan–Mar (peak wet) were assessed for NDVI in the following Apr–May late wet season to determine whether high-intensity grazing stimulates or suppresses subsequent vegetation productivity.</div>
         <!-- Methodology diagram -->
         <div class="lag-diagram">
           <div class="lag-node">
@@ -393,7 +393,7 @@ input[type=range].op-sl::-moz-range-thumb{width:11px;height:11px;border-radius:5
     <div class="act-label" style="margin-top:0"><span class="act-num">03</span> How does vegetation productivity compare between the Protected Area and the Area beyond it?</div>
     <div class="card">
       <div class="card-hd"><span class="card-title">Vegetation Analysis: Protected Area vs Area Beyond Protected Area</span></div>
-      <div class="card-insight">Mean NDVI was compared between the Protected Area and the area beyond its boundary (20km buffer zone) across the dry (Jun–Jul) and wet (Nov–Dec) seasons. This showed that migratory grazing amplified vegetation productivity relative to area beyond the protected ecosystem.</div>
+      <div class="card-insight">Mean NDVI was compared between the Protected Area and the area beyond its boundary (20km buffer zone) across the dry (Jun–Jul) and wet (Nov–Dec) seasons. This reveals whether conservation status and migratory grazing together amplify vegetation productivity relative to unprotected land.</div>
       <div class="card-body"><div class="ch" style="height:320px"><canvas id="c-veg-pa"></canvas></div></div>
     </div>
 
@@ -544,7 +544,7 @@ input[type=range].op-sl::-moz-range-thumb{width:11px;height:11px;border-radius:5
 
 </div><!-- /body -->
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 'use strict';
 const API = 'https://web-production-4b33a.up.railway.app';
 let map, kdeLayer, socLayer, rainLayer, ndviLayer, demLayer, studyLayer, paLayer, residLayer, wbLayer;
@@ -563,19 +563,7 @@ Chart.defaults.font.family = "'IBM Plex Mono', monospace";
 Chart.defaults.font.size = 11;
 
 function dc(id){if(chartReg[id]){chartReg[id].destroy();delete chartReg[id];}}
-async function get(path, timeoutMs=28000){
-  const ctrl=new AbortController();
-  const tid=setTimeout(()=>ctrl.abort(),timeoutMs);
-  try{
-    const r=await fetch(API+path,{signal:ctrl.signal});
-    clearTimeout(tid);
-    if(!r.ok)throw new Error(r.status+' '+path);
-    return r.json();
-  }catch(e){
-    clearTimeout(tid);
-    throw e;
-  }
-}
+async function get(path){const r=await fetch(API+path);if(!r.ok)throw new Error(r.status+' '+path);return r.json();}
 
 // ── HEALTH ──
 (async()=>{
@@ -590,8 +578,9 @@ async function get(path, timeoutMs=28000){
     await get('/api/health');
     document.getElementById('dot').className='dot ok';
     document.getElementById('sttxt').textContent='Connected';
-    // Only load KDE (janmar) + protected areas on startup — everything else loads on toggle
-    await Promise.all([loadPALayer(), loadKDE()]);
+    await Promise.all([loadPALayer(), loadKDE(), loadRainLayer()]);
+    if(document.getElementById('t-wb').classList.contains('on')) await loadWBLayer();
+    await loadSOCLayer();
     await loadGvU();
   }catch(e){
     console.error('Backend error:',e);
@@ -1454,4 +1443,15 @@ document.querySelectorAll('.tab').forEach(tab=>{
       renderSOCPanel();
     }
     if(tab.dataset.p==='paveg'){
-      dc('
+      dc('veg-pa'); dc('veg-gain');
+      requestAnimationFrame(renderVegPA);
+    }
+    if(tab.dataset.p==='regression'){
+      dc('ols'); dc('drivers');
+      requestAnimationFrame(renderRegressionPanel);
+    }
+  });
+});
+</script>
+</body>
+</html>
